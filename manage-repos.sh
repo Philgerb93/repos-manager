@@ -14,7 +14,7 @@ function rate_exceeded {
 }
 
 function file_exists {
-    if [ -d "$1" ] && [ -e "$1/.git" ]; then
+    if [ -d "../$1" ] && [ -e "../$1/.git" ]; then
         return 0
     else
         return 1
@@ -57,13 +57,16 @@ while read -r repo; do
         echo -e "\n$repo: FOLDER FOUND"
         
         (
-        cd "$repo" || exit
+        cd "../$repo" || exit
         test_project
         )
     else
         echo -e "\n$repo: FOLDER MISSING"
         
-        git clone "$repo_link"
-        echo -e "Project has been cloned into current directory."
+        git clone "$repo_link" "../$repo"
+        echo -e "Project has been cloned into parent directory."
     fi
 done <<< "$repos"
+
+echo -e "\nPress ENTER to exit."
+read
