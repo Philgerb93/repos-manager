@@ -3,6 +3,11 @@
 github_user="Philgerb93"
 repos=$(curl "https://api.github.com/users/$github_user/repos?per_page=100" -s | grep -o 'git@[^"]*' | cut -d '/' -f 2 | cut -d '.' -f 1)
 
+red="\033[0;31m"
+green="\033[0;32m"
+yellow="\033[1;33m"
+reset="\033[0m"
+
 function rate_exceeded {
     err_msg=$(curl "https://api.github.com/users/$github_user/repos?per_page=100" -s | grep 'API rate limit exceeded')
     
@@ -23,15 +28,15 @@ function file_exists {
 
 function test_project {
     if clean; then
-        echo "OK: Nothing to commit"
+        echo -e "${green}OK${reset}: Nothing to commit"
     else
-        echo "WARNING: Uncommitted changes detected"
+        echo -e "${red}WARNING${reset}: Uncommitted changes detected"
     fi
 
     if up_to_date; then
-        echo "OK: Up to date"
+        echo -e "${green}OK${reset}: Up to date"
     else
-        echo "WARNING: Behind repository, pull needed"
+        echo -e "${red}WARNING${reset}: Behind repository, pull needed"
     fi
 }
 
@@ -54,14 +59,14 @@ while read -r repo; do
     repo_link="https://github.com/$github_user/$repo"
 
     if file_exists "$repo"; then
-        echo -e "\n$repo: FOLDER FOUND"
+        echo -e "\n$repo: ${yellow}FOLDER FOUND${reset}"
         
         (
         cd "../$repo" || exit
         test_project
         )
     else
-        echo -e "\n$repo: FOLDER MISSING"
+        echo -e "\n$repo: ${yellow}FOLDER MISSING${reset}"
         
         git clone "$repo_link" "../$repo"
         echo -e "Project has been cloned into parent directory."
